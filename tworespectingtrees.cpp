@@ -13,7 +13,8 @@
 #include "packer.cpp"
 using namespace std;
 
-const double inf = 1e9+5;
+const double inf = 1e9+5, eps1 = 1.0/100.0, eps2 = 1.0/6.0, eps3 = 1.0/5.0;
+const double f = 3/2.0 - (1.0+eps1)*(1.0+eps2)/(1.0-eps3);
 
 double compute_U(const pgraph G)
 {
@@ -39,11 +40,12 @@ vector<ptree> sample(const vector<ptree>& packing, double d, int n)
 	default_random_engine generator;
 	uniform_int_distribution<int> distribution(0, int(packing.size())-1);
 	vector<ptree> res;
-	for(int i = 0;i < ceil(36.43*d*log(n));i++) res.emplace_back(packing[distribution(generator)]);
+	int req = ceil(-d*log(n)/log(1-f));
+	for(int i = 0;i < req;i++) res.emplace_back(packing[distribution(generator)]);
 	return res;
 }
 
-const double eps = 1e-11;
+const double cmpeps = 1e-11;
 
 // Algorithm 2: Obtain spanning trees with probability of success 1 − 1/(G->n)^d
 vector<ptree> tworespectingtrees(double d, pgraph _G)
@@ -53,11 +55,11 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 
 	pgraph Gdash = new graph(_G->n, _G->m, Edash);
 
-	double b = 3.0*6*6*(d+2.0)*log(Gdash->n);
+	double b = 3.0*(d+2.0)*log(Gdash->n)/(eps2*eps2);
 
 	for(auto it: Gdash->E)
 	{
-		it->w = round(it->w*100);
+		it->w = round(it->w*(1/eps1));
 	}
 
 	double c = compute_U(Gdash);
@@ -70,7 +72,7 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		double p = min(1.0, b/c);
 		for(auto it: Gdash->E)
 		{
-			double wt = min(binom(it->w, p), int(ceil((7.0/6.0)*12.0*b)));
+			double wt = min(binom(it->w, p), int(ceil((1+eps2)*12.0*b)));
 			//if(lastrun) cout << it->idx << " " << wt << "\n";
 			multiset<double> l;
 			for(int i = 0;i < wt;i++) l.insert(0);
@@ -80,8 +82,8 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		ppackergraph H = new packergraph(Gdash->n, Gdash->m, HE);
 		pair<double, vector<ptree>> packing = packer(H);
 
-		if(lastrun || fabs(1.0-p) < eps) return sample(packing.second, d, Gdash->n);
-		else if(packing.first >= (24.0*b/70.0))
+		if(lastrun || fabs(1.0-p) < cmpeps) return sample(packing.second, d, Gdash->n);
+		else if(packing.first >= ((1-eps3)*b/(2.0*(1+eps2))))
 		{
 			c /= 6.0;
 			lastrun = 1;

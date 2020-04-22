@@ -12,6 +12,8 @@
 #include "graph.cpp"
 using namespace std;
 
+const double eps = 1/5.0;
+
 class packeredge {
 public:
 	int u, v, idx;
@@ -63,7 +65,7 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 			{
 				dsu(a, b, P, sz);
 				T.emplace_back(it);
-				double newl = *it->l.begin()+1.0/(75.0*log(G->m));
+				double newl = *it->l.begin()+(eps*eps)/(3.0*log(G->m));
 				if(newl > 1)
 				{
 					pair<double, vector<ptree>> res;
@@ -85,6 +87,6 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 		}
 
 		packerEdges.emplace_back(T);
-		W += 1.0/(75.0*log(G->m));
+		W += (eps*eps)/(3.0*log(G->m));
 	}
 }
