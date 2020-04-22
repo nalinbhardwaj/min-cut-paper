@@ -33,7 +33,7 @@ pgraph graph_reader()
 		scanf("%d%d%lf", &u, &v, &c);
 		//u--, v--;
 		pedge tmp = new edge(u, v, i, c);
-		E.push_back(tmp);
+		E.emplace_back(tmp);
 	}
 
 	return new graph(n, m, E);
@@ -61,7 +61,7 @@ ptree tree_reader()
 		//u--, v--;
 		//cout << u << " " << v << " " << c << "\n";
 		pedge tmp = new edge(u, v, idx, c);
-		E.push_back(tmp);
+		E.emplace_back(tmp);
 	}
 
 	return new tree(n, E);

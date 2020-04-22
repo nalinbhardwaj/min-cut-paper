@@ -65,7 +65,7 @@ public:
 		if(head[chain] == -1) head[chain] = node;
 		val[int(st.size())] = inc;
 		inst[node] = int(st.size());
-		st.push_back(node);
+		st.emplace_back(node);
 
 		pair<int, pair<double, int>> largest = {-1, {-1, -1}};
 		for(auto it: T->adj[node])
@@ -121,7 +121,7 @@ public:
 
 		vector<pair<int, int>> res = ancestrybreakdown(origx, x);
 		vector<pair<int, int>> tmp = ancestrybreakdown(origy, y);
-		for(auto it: tmp) res.push_back(it);
+		for(auto it: tmp) res.emplace_back(it);
 
 		return res;
 	}
@@ -162,8 +162,8 @@ public:
 			{
 				int a = min(gt.first, gt.second), b = max(gt.first, gt.second);
 
-				events[a][0].push_back(it);
-				events[b][1].push_back(it);
+				events[a][0].emplace_back(it);
+				events[b][1].emplace_back(it);
 			}
 
 			D->PathAdd(it->u, it->v, it->w);

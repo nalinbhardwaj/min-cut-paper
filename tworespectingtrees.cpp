@@ -39,7 +39,7 @@ vector<ptree> sample(const vector<ptree>& packing, double d, int n)
 	default_random_engine generator;
 	uniform_int_distribution<int> distribution(0, int(packing.size())-1);
 	vector<ptree> res;
-	for(int i = 0;i < ceil(36.43*d*log(n));i++) res.push_back(packing[distribution(generator)]);
+	for(int i = 0;i < ceil(36.43*d*log(n));i++) res.emplace_back(packing[distribution(generator)]);
 	return res;
 }
 
@@ -49,7 +49,7 @@ const double eps = 1e-11;
 vector<ptree> tworespectingtrees(double d, pgraph _G)
 {
 	vector<pedge> Edash;
-	for(auto it: _G->E) Edash.push_back(new edge(it->u, it->v, it->idx, it->w));
+	for(auto it: _G->E) Edash.emplace_back(new edge(it->u, it->v, it->idx, it->w));
 
 	pgraph Gdash = new graph(_G->n, _G->m, Edash);
 
@@ -74,7 +74,7 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 			//if(lastrun) cout << it->idx << " " << wt << "\n";
 			multiset<double> l;
 			for(int i = 0;i < wt;i++) l.insert(0);
-			HE.push_back(new packeredge(it->u, it->v, it->idx, wt, l));
+			HE.emplace_back(new packeredge(it->u, it->v, it->idx, wt, l));
 		}
 
 		ppackergraph H = new packergraph(Gdash->n, Gdash->m, HE);

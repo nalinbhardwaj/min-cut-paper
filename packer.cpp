@@ -50,11 +50,11 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 	double W = 0;
 	vector<vector<ppackeredge>> packerEdges;
 
+	vector<int> P(G->n), sz(G->n);
 	while(true)
 	{
 		sort(G->E.begin(), G->E.end(), [](ppackeredge a, ppackeredge b) { return *a->l.begin() < *b->l.begin(); });
 		vector<ppackeredge> T;
-		vector<int> P(G->n), sz(G->n);
 		for(int i = 0;i < G->n;i++) P[i] = i, sz[i] = 1;
 		for(auto it: G->E)
 		{
@@ -62,7 +62,7 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 			if(root(a, P) != root(b, P))
 			{
 				dsu(a, b, P, sz);
-				T.push_back(it);
+				T.emplace_back(it);
 				double newl = *it->l.begin()+1.0/(75.0*log(G->m));
 				if(newl > 1)
 				{
@@ -71,9 +71,9 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 					for(auto it: packerEdges)
 					{
 						vector<pedge> tmpedges;
-						for(auto gt: it) tmpedges.push_back(new edge(gt->u, gt->v, gt->idx, gt->w));
+						for(auto gt: it) tmpedges.emplace_back(new edge(gt->u, gt->v, gt->idx, gt->w));
 						ptree tmp = new tree(G->n, tmpedges);
-						res.second.push_back(tmp);
+						res.second.emplace_back(tmp);
 					}
 
 					return res;
@@ -84,7 +84,7 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 			}
 		}
 
-		packerEdges.push_back(T);
+		packerEdges.emplace_back(T);
 		W += 1.0/(75.0*log(G->m));
 	}
 }
