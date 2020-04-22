@@ -20,17 +20,16 @@ int binom(int trials, double p)
 	return distribution(generator);
 }
 
-vector<ptree> sample(vector<ptree>& packing, double d, int n)
+vector<ptree> sample(const vector<ptree>& packing, double d, int n)
 {
-	vector<double> wts;
-	for(auto it: packing) wts.push_back(it->wt);
-
 	default_random_engine generator;
-	discrete_distribution<int> distribution(wts.begin(), wts.end());
+	uniform_int_distribution<int> distribution(0, int(packing.size())-1);
 	vector<ptree> res;
 	for(int i = 0;i < ceil(36.43*d*log(n));i++) res.push_back(packing[distribution(generator)]);
 	return res;
 }
+
+const double eps = 1e-11;
 
 // Algorithm 2: Obtain spanning trees with probability of success 1 − 1/(G->n)^d
 vector<ptree> tworespectingtrees(double d, pgraph _G)
@@ -53,9 +52,10 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 	{
 		//cout << c << " " << lastrun << " " << b/c << "\n";
 		vector<ppackeredge> HE;
+		double p = min(1.0, b/c);
 		for(auto it: Gdash->E)
 		{
-			double wt = min(binom(it->w, min(1.0, b/c)), int(ceil((7.0/6.0)*12.0*b)));
+			double wt = min(binom(it->w, p), int(ceil((7.0/6.0)*12.0*b)));
 			//if(lastrun) cout << it->idx << " " << wt << "\n";
 			multiset<double> l;
 			for(int i = 0;i < wt;i++) l.insert(0);
@@ -65,7 +65,7 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		ppackergraph H = new packergraph(Gdash->n, Gdash->m, HE);
 		pair<double, vector<ptree>> packing = packer(H);
 
-		if(lastrun) return sample(packing.second, d, Gdash->n);
+		if(lastrun || fabs(1.0-p) < eps) return sample(packing.second, d, Gdash->n);
 		else if(packing.first >= (24.0*b/70.0))
 		{
 			c /= 6.0;

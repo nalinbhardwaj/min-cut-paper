@@ -36,70 +36,55 @@ typedef packergraph* ppackergraph;
 
 inline int root(int x, vector<int>& P) { return (P[x]==x)?x:(P[x]=root(P[x], P)); }
 
-void dsu(int x, int y, vector<int>& P)
+void dsu(int x, int y, vector<int>& P, vector<int>& sz)
 {
 	x = root(x, P), y = root(y, P);
+	if(sz[x] > sz[y]) swap(x, y);
 	P[x] = y;
-}
-
-typedef long long int lli;
-
-const lli MOD = lli(1e9)+7;
-
-lli hsh(const vector<ppackeredge>& T, lli r)
-{
-	lli res = 1ll;
-	for(auto it: T)
-	{
-		res *= lli(r+it->idx)%MOD;
-		res %= MOD;
-	}
-	return res;
+	sz[y] += sz[x];
 }
 
 // Algorithm 1: Given an unweighted, undirected graph, compute packing of weight at least .4c
 pair<double, vector<ptree>> packer(ppackergraph G)
 {
-	double maxl = 0;
-	lli r = rand()%MOD;
-	map<lli, vector<ppackeredge>> mp;
-	map<lli, double> wt;
+	double W = 0;
+	vector<vector<ppackeredge>> packerEdges;
 
-	while(maxl < 1.0)
+	while(true)
 	{
 		sort(G->E.begin(), G->E.end(), [](ppackeredge a, ppackeredge b) { return *a->l.begin() < *b->l.begin(); });
 		vector<ppackeredge> T;
-		vector<int> P(G->n);
-		for(int i = 0;i < G->n;i++) P[i] = i;
+		vector<int> P(G->n), sz(G->n);
+		for(int i = 0;i < G->n;i++) P[i] = i, sz[i] = 1;
 		for(auto it: G->E)
 		{
 			int a = it->u, b = it->v;
 			if(root(a, P) != root(b, P))
 			{
-				dsu(a, b, P);
+				dsu(a, b, P, sz);
 				T.push_back(it);
 				double newl = *it->l.begin()+1.0/(75.0*log(G->m));
+				if(newl > 1)
+				{
+					pair<double, vector<ptree>> res;
+					res.first = W;
+					for(auto it: packerEdges)
+					{
+						vector<pedge> tmpedges;
+						for(auto gt: it) tmpedges.push_back(new edge(gt->u, gt->v, gt->idx, gt->w));
+						ptree tmp = new tree(G->n, tmpedges);
+						res.second.push_back(tmp);
+					}
+
+					return res;
+				}
+
 				it->l.erase(it->l.begin());
 				it->l.insert(newl);
-				maxl = max(maxl, newl);
 			}
 		}
-		lli h = hsh(T, r);
 
-		if(wt.find(h) == wt.end()) mp[h] = T;
-		wt[h] += 1.0/(75.0*log(G->m));
+		packerEdges.push_back(T);
+		W += 1.0/(75.0*log(G->m));
 	}
-
-	pair<double, vector<ptree>> res;
-
-	for(auto it: mp)
-	{
-		vector<pedge> tmpedges;
-		for(auto gt: it.second) tmpedges.push_back(new edge(gt->u, gt->v, gt->idx, gt->w));
-		ptree tmp = new tree(G->n, wt[it.first], tmpedges);
-		res.first += tmp->wt;
-		res.second.push_back(tmp);
-	}
-
-	return res;
 }

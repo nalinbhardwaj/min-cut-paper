@@ -37,8 +37,7 @@ typedef graph* pgraph;
 
 class tree : public graph {
 public:
-	double wt;
-	tree(int _n, double _wt, vector<pedge>& _E) : graph(_n, _n-1, _E) { wt = _wt; }
+	tree(int _n, vector<pedge>& _E) : graph(_n, _n-1, _E) { }
 };
 
 typedef tree* ptree;

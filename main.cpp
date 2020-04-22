@@ -64,7 +64,7 @@ ptree tree_reader()
 		E.push_back(tmp);
 	}
 
-	return new tree(n, 1.0, E);
+	return new tree(n, E);
 }
 
 void tester(pgraph G)
@@ -77,7 +77,12 @@ void tester(pgraph G)
 	// Fix wts using edge index
 	for(auto it: trees)
 	{
-		for(auto gt: it->E) gt->w = G->E[gt->idx]->w;
+		for(auto gt: it->E)
+		{
+			gt->w = G->E[gt->idx]->w;
+			cout << gt->u << " " << gt->v << " " << gt->idx << " " << gt->w << "\n";
+		}
+		cout << "\n";
 	}
 
 	//vector<ptree> trees;
