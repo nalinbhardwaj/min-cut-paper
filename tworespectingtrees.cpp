@@ -13,6 +13,20 @@
 #include "packer.cpp"
 using namespace std;
 
+const double inf = 1e9+5;
+
+double compute_U(const pgraph G)
+{
+	double res = inf;
+	for(auto it: G->adj)
+	{
+		double tmp = 0;
+		for(auto gt: it) tmp += gt->w;
+		res = min(res, tmp);
+	}
+	return res;
+}
+
 int binom(int trials, double p)
 {
 	default_random_engine generator;
@@ -39,13 +53,14 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 
 	pgraph Gdash = new graph(_G->n, _G->m, Edash);
 
-	double b = 3.0*6*6*(d+2.0)*log(Gdash->n), c = 0;
+	double b = 3.0*6*6*(d+2.0)*log(Gdash->n);
 
 	for(auto it: Gdash->E)
 	{
 		it->w = round(it->w*100);
-		c += it->w;
 	}
+
+	double c = compute_U(Gdash);
 
 	bool lastrun = 0;
 	while(true)
