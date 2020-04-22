@@ -80,9 +80,9 @@ void tester(pgraph G)
 		for(auto gt: it->E)
 		{
 			gt->w = G->E[gt->idx]->w;
-			cout << gt->u << " " << gt->v << " " << gt->idx << " " << gt->w << "\n";
+			//cout << gt->u << " " << gt->v << " " << gt->idx << " " << gt->w << "\n";
 		}
-		cout << "\n";
+		//cout << "\n";
 	}
 
 	//vector<ptree> trees;

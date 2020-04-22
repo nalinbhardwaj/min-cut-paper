@@ -190,6 +190,10 @@ public:
 				D->PathAdd(it->u, it->v, it->w);
 			}
 		}
+
+		double singlecut = D->QueryMinimum();
+		res = min(singlecut, res);
+		
 		return res;
 	}
 };
