@@ -13,8 +13,10 @@
 #include "packer.cpp"
 using namespace std;
 
-const double inf = 1e9+5, eps1 = 1.0/100.0, eps2 = 1.0/6.0, eps3 = 1.0/5.0;
+const double inf = 1e12+5, eps1 = 1.0/100.0, eps2 = 1.0/6.0, eps3 = 1.0/5.0;
 const double f = 3/2.0 - (1.0+eps1)*(1.0+eps2)/(1.0-eps3);
+const double cmpeps = 1e-11;
+default_random_engine generator(time(NULL));
 
 double compute_U(const pgraph G)
 {
@@ -28,24 +30,36 @@ double compute_U(const pgraph G)
 	return res;
 }
 
-int binom(int trials, double p)
-{
-	default_random_engine generator;
-	binomial_distribution<int> distribution(trials, p);
-	return distribution(generator);
+// inverse transform sampling in O(ceil) time
+long long binom(long long trials, long double p, long long ceil)
+{	
+	if (p > 1-cmpeps)
+		return trials;
+
+	uniform_real_distribution<double> distribution(0.0,1.0);
+	double u = distribution(generator);
+
+	long double prob = pow(1-p,trials);
+	long double cum_prob = prob;
+	for (int i = 0; i <= ceil; ++i) {
+		if (cum_prob >= u-cmpeps) {
+			return i;
+		}
+		prob *= (long double)(trials-i)/(i+1) * p/(1-p);
+		cum_prob += prob;
+	}
+
+	return ceil;
 }
 
 vector<ptree> sample(const vector<ptree>& packing, double d, int n)
 {
-	default_random_engine generator;
 	uniform_int_distribution<int> distribution(0, int(packing.size())-1);
 	vector<ptree> res;
 	int req = ceil(-d*log(n)/log(1-f));
 	for(int i = 0;i < req;i++) res.emplace_back(packing[distribution(generator)]);
 	return res;
 }
-
-const double cmpeps = 1e-11;
 
 // Algorithm 2: Obtain spanning trees with probability of success 1 − 1/(G->n)^d
 vector<ptree> tworespectingtrees(double d, pgraph _G)
@@ -72,7 +86,7 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		double p = min(1.0, b/c);
 		for(auto it: Gdash->E)
 		{
-			double wt = min(binom(it->w, p), int(ceil((1+eps2)*12.0*b)));
+			double wt = binom(it->w, p, (long long)(ceil((1+eps2)*12.0*b)));
 			//if(lastrun) cout << it->idx << " " << wt << "\n";
 			multiset<double> l;
 			for(int i = 0;i < wt;i++) l.insert(0);
