@@ -17,9 +17,8 @@ const double eps = 1/5.0;
 class packeredge {
 public:
 	int u, v, idx;
-	double w;
 	multiset<double> l;
-	packeredge(int _u, int _v, int _idx, double _w, multiset<double>& _l) { u = _u, v = _v, idx = _idx, w = _w, l = _l; }
+	packeredge(int _u, int _v, int _idx, multiset<double>& _l) { u = _u, v = _v, idx = _idx, l = _l; }
 };
 
 typedef packeredge* ppackeredge;
@@ -73,7 +72,7 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 					for(auto it: packerEdges)
 					{
 						vector<pedge> tmpedges;
-						for(auto gt: it) tmpedges.emplace_back(new edge(gt->u, gt->v, gt->idx, gt->w));
+						for(auto gt: it) tmpedges.emplace_back(new edge(gt->u, gt->v, gt->idx, 0));
 						ptree tmp = new tree(G->n, tmpedges);
 						res.second.emplace_back(tmp);
 					}

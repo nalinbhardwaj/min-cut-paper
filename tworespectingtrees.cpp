@@ -81,10 +81,21 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 	double c = compute_U(Gdash);
 
 	bool lastrun = 0;
+	vector<ppackeredge> HE;
+	vector<ppackeredge> href(Gdash->m);
+
+	for(auto it: Gdash->E)
+	{
+		multiset<double> l;
+		HE.emplace_back(new packeredge(it->u, it->v, it->idx, l));
+		href[it->idx] = HE.back();
+	}
+
+	ppackergraph H = new packergraph(Gdash->n, Gdash->m, HE);
+
 	while(true)
 	{
 		//cout << c << " " << lastrun << " " << b/c << "\n";
-		vector<ppackeredge> HE;
 		double p = min(1.0, b/c);
 		for(auto it: Gdash->E)
 		{
@@ -92,10 +103,10 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 			//if(lastrun) cout << it->idx << " " << wt << "\n";
 			multiset<double> l;
 			for(int i = 0;i < wt;i++) l.insert(0);
-			HE.emplace_back(new packeredge(it->u, it->v, it->idx, wt, l));
+			href[it->idx]->l = l;
 		}
 
-		ppackergraph H = new packergraph(Gdash->n, Gdash->m, HE);
+		H->E = HE;
 		pair<double, vector<ptree>> packing = packer(H);
 
 		if(lastrun || p >= 1.0-cmpeps) return sample(packing.second, d, Gdash->n);
