@@ -9,6 +9,7 @@
 #include <random>
 #include <cstdlib>
 #include <algorithm>
+#include <queue>
 #include "graph.cpp"
 using namespace std;
 
@@ -17,8 +18,8 @@ const double eps = 1/5.0;
 class packeredge {
 public:
 	int u, v, idx;
-	multiset<double> l;
-	packeredge(int _u, int _v, int _idx, multiset<double>& _l) { u = _u, v = _v, idx = _idx, l = _l; }
+	priority_queue<double> l;
+	packeredge(int _u, int _v, int _idx, priority_queue<double>& _l) { u = _u, v = _v, idx = _idx, l = _l; }
 };
 
 typedef packeredge* ppackeredge;
@@ -52,27 +53,32 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 	vector<vector<ppackeredge>> packerEdges;
 
 	vector<int> P(G->n), sz(G->n);
+	vector<pair<int, int>> sorter(G->m);
+	vector<ppackeredge> href(G->m);
+	for(auto it: G->E) href[it->idx] = it;
 	while(true)
 	{
-		sort(G->E.begin(), G->E.end());
+		for(auto it: G->E) sorter[it->idx] = {-it->l.top(), it->idx};
+		sort(sorter.begin(), sorter.end());
 		vector<ppackeredge> T;
 		for(int i = 0;i < G->n;i++) P[i] = i, sz[i] = 1;
-		for(auto it: G->E)
+		for(auto idx: sorter)
 		{
+			auto it = href[idx.second];
 			int a = it->u, b = it->v;
 			if(root(a, P) != root(b, P))
 			{
 				dsu(a, b, P, sz);
 				T.emplace_back(it);
-				double newl = *it->l.begin()+(eps*eps)/(3.0*log(G->m));
+				double newl = -it->l.top()+(eps*eps)/(3.0*log(G->m));
 				if(newl > 1)
 				{
 					pair<double, vector<ptree>> res;
 					res.first = W;
-					for(auto it: packerEdges)
+					for(auto kt: packerEdges)
 					{
 						vector<pedge> tmpedges;
-						for(auto gt: it) tmpedges.emplace_back(new edge(gt->u, gt->v, gt->idx, 0));
+						for(auto gt: kt) tmpedges.emplace_back(new edge(gt->u, gt->v, gt->idx, 0));
 						ptree tmp = new tree(G->n, tmpedges);
 						res.second.emplace_back(tmp);
 					}
@@ -80,8 +86,8 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 					return res;
 				}
 
-				it->l.erase(it->l.begin());
-				it->l.insert(newl);
+				it->l.pop();
+				it->l.emplace(-newl);
 			}
 		}
 

@@ -84,10 +84,10 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 	vector<ppackeredge> HE;
 	vector<ppackeredge> href(Gdash->m);
 
+	priority_queue<double> tmpl;
 	for(auto it: Gdash->E)
 	{
-		multiset<double> l;
-		HE.emplace_back(new packeredge(it->u, it->v, it->idx, l));
+		HE.emplace_back(new packeredge(it->u, it->v, it->idx, tmpl));
 		href[it->idx] = HE.back();
 	}
 
@@ -101,8 +101,8 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		{
 			double wt = binom(it->w, p, lli(ceil((1+eps2)*12.0*b)));
 			//if(lastrun) cout << it->idx << " " << wt << "\n";
-			multiset<double> l;
-			for(int i = 0;i < wt;i++) l.insert(0);
+			priority_queue<double> l;
+			for(int i = 0;i < wt;i++) l.emplace(0);
 			href[it->idx]->l = l;
 		}
 
