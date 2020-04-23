@@ -84,9 +84,16 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 {
 	vector<ptree> res;
 	vector<pedge> Edash;
+	double normaliser = inf;
 	for(auto it: _G->E)
 	{
-		auto tmp = new edge(it->u, it->v, it->idx, it->w); 
+		if(it->w >= cmpeps) normaliser = min(normaliser, it->w);
+	}
+	
+	normaliser = 1.0/normaliser;
+	for(auto it: _G->E)
+	{
+		auto tmp = new edge(it->u, it->v, it->idx, it->w*normaliser); 
 		Edash.emplace_back(tmp);
 	}
 
