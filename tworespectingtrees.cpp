@@ -16,7 +16,7 @@ using namespace std;
 typedef long long int lli;
 
 const double inf = 1e12+5, eps1 = 1.0/100.0, eps2 = 1.0/6.0, eps3 = 1.0/5.0;
-const double f = 3/2.0 - (1.0+eps1)*(1.0+eps2)/(1.0-eps3);
+const double f = 3/2.0 - ((2.0+eps1)*(1.0+eps2))/((2.0-eps1)*(1.0-eps3));
 const double cmpeps = 1e-11;
 default_random_engine generator(time(NULL));
 
