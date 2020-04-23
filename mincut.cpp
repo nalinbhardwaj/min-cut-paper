@@ -16,7 +16,7 @@ using namespace std;
 // Algorithm 4: initialise and call compute() to solve.
 class mincut {
 public:
-	const double inf = int(1e9)+5;
+	const double inf = 1e12+5;
 
 	ptree T;
 	pgraph G;

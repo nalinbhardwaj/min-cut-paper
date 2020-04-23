@@ -13,6 +13,8 @@
 #include "packer.cpp"
 using namespace std;
 
+typedef long long int lli;
+
 const double inf = 1e12+5, eps1 = 1.0/100.0, eps2 = 1.0/6.0, eps3 = 1.0/5.0;
 const double f = 3/2.0 - (1.0+eps1)*(1.0+eps2)/(1.0-eps3);
 const double cmpeps = 1e-11;
@@ -31,7 +33,7 @@ double compute_U(const pgraph G)
 }
 
 // inverse transform sampling in O(ceil) time
-long long binom(long long trials, long double p, long long ceil)
+lli binom(lli trials, long double p, lli ceil)
 {	
 	if (p > 1-cmpeps)
 		return trials;
@@ -86,7 +88,7 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		double p = min(1.0, b/c);
 		for(auto it: Gdash->E)
 		{
-			double wt = binom(it->w, p, (long long)(ceil((1+eps2)*12.0*b)));
+			double wt = binom(it->w, p, lli(ceil((1+eps2)*12.0*b)));
 			//if(lastrun) cout << it->idx << " " << wt << "\n";
 			multiset<double> l;
 			for(int i = 0;i < wt;i++) l.insert(0);
@@ -96,7 +98,7 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		ppackergraph H = new packergraph(Gdash->n, Gdash->m, HE);
 		pair<double, vector<ptree>> packing = packer(H);
 
-		if(lastrun || fabs(1.0-p) < cmpeps) return sample(packing.second, d, Gdash->n);
+		if(lastrun || p >= 1.0-cmpeps) return sample(packing.second, d, Gdash->n);
 		else if(packing.first >= ((1-eps3)*b/(2.0*(1+eps2))))
 		{
 			c /= 6.0;

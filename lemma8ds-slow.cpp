@@ -12,10 +12,12 @@
 #include "graph.cpp"
 using namespace std;
 
+typedef long long int lli;
+
 // Lemma 8 DS: Slow version
 class lemma8ds {
 public:
-	const int inf = int(1e9)+5;
+	const lli inf = lli(1e12)+5;
 
 	ptree T;
 	int curst = 0, totchain = 0, maxlog;
