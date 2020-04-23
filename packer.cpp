@@ -55,7 +55,7 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 	vector<int> P(G->n), sz(G->n);
 	while(true)
 	{
-		sort(G->E.begin(), G->E.end(), [](ppackeredge a, ppackeredge b) { return *a->l.begin() < *b->l.begin(); });
+		sort(G->E.begin(), G->E.end());
 		vector<ppackeredge> T;
 		for(int i = 0;i < G->n;i++) P[i] = i, sz[i] = 1;
 		for(auto it: G->E)
