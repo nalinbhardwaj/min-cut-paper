@@ -45,6 +45,11 @@ public:
 		init();
 	}
 
+	void clear()
+	{
+		delete(D);
+	}
+
 	void dfs0(int node, int par, int ht)
 	{
 		sz[node] = 1; H[node] = ht; jmp[node][0] = par;
@@ -193,7 +198,7 @@ public:
 
 		double singlecut = D->QueryMinimum();
 		res = min(singlecut, res);
-		
+
 		return res;
 	}
 };

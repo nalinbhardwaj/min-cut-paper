@@ -36,7 +36,8 @@ pgraph graph_reader()
 		E.emplace_back(tmp);
 	}
 
-	return new graph(n, m, E);
+	pgraph res = new graph(n, m, E);
+	return res;
 }
 
 // Read tree from stdin
@@ -64,7 +65,8 @@ ptree tree_reader()
 		E.emplace_back(tmp);
 	}
 
-	return new tree(n, E);
+	ptree res = new tree(n, E);
+	return res;
 }
 
 void tester(pgraph G)
@@ -93,7 +95,16 @@ void tester(pgraph G)
 	{
 		mincut mc(G, it);
 		res = min(res, mc.compute());
+		mc.clear();
 	}
+
+	for(auto it: trees)
+	{
+		for(auto gt: it->E) delete(gt);
+		delete(it);
+	}
+	for(auto it: G->E) delete(it);
+	delete(G);
 
 	printf("%lf\n", res);
 }

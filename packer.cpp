@@ -78,7 +78,12 @@ pair<double, vector<ptree>> packer(ppackergraph G)
 					for(auto kt: packerEdges)
 					{
 						vector<pedge> tmpedges;
-						for(auto gt: kt) tmpedges.emplace_back(new edge(gt->u, gt->v, gt->idx, 0));
+						for(auto gt: kt)
+						{
+							pedge tmp = new edge(gt->u, gt->v, gt->idx, 0);
+							tmpedges.emplace_back(tmp);
+						}
+						
 						ptree tmp = new tree(G->n, tmpedges);
 						res.second.emplace_back(tmp);
 					}

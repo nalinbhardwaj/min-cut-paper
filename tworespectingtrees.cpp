@@ -58,16 +58,37 @@ vector<ptree> sample(const vector<ptree>& packing, double d, int n)
 {
 	uniform_int_distribution<int> distribution(0, int(packing.size())-1);
 	vector<ptree> res;
+	vector<bool> marker(int(packing.size()));
 	int req = ceil(-d*log(n)/log(1-f));
-	for(int i = 0;i < req;i++) res.emplace_back(packing[distribution(generator)]);
+	for(int i = 0;i < req;i++)
+	{
+		int tmp = distribution(generator);
+		marker[tmp] = 1;
+		res.emplace_back(packing[tmp]);
+	}
+
+	for(int i = 0;i < int(packing.size());i++)
+	{
+		if(!marker[i])
+		{
+			for(auto it: packing[i]->E) delete(it);
+			delete(packing[i]);
+		}
+	}
+	
 	return res;
 }
 
 // Algorithm 2: Obtain spanning trees with probability of success 1 − 1/(G->n)^d
 vector<ptree> tworespectingtrees(double d, pgraph _G)
 {
+	vector<ptree> res;
 	vector<pedge> Edash;
-	for(auto it: _G->E) Edash.emplace_back(new edge(it->u, it->v, it->idx, it->w));
+	for(auto it: _G->E)
+	{
+		auto tmp = new edge(it->u, it->v, it->idx, it->w); 
+		Edash.emplace_back(tmp);
+	}
 
 	pgraph Gdash = new graph(_G->n, _G->m, Edash);
 
@@ -87,7 +108,8 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 	priority_queue<double> tmpl;
 	for(auto it: Gdash->E)
 	{
-		HE.emplace_back(new packeredge(it->u, it->v, it->idx, tmpl));
+		auto tmp = new packeredge(it->u, it->v, it->idx, tmpl);
+		HE.emplace_back(tmp);
 		href[it->idx] = HE.back();
 	}
 
@@ -109,12 +131,31 @@ vector<ptree> tworespectingtrees(double d, pgraph _G)
 		H->E = HE;
 		pair<double, vector<ptree>> packing = packer(H);
 
-		if(lastrun || p >= 1.0-cmpeps) return sample(packing.second, d, Gdash->n);
-		else if(packing.first >= ((1-eps3)*b/(2.0*(1+eps2))))
+		if(lastrun || p >= 1.0-cmpeps)
 		{
-			c /= 6.0;
-			lastrun = 1;
+			res = sample(packing.second, d, Gdash->n);
+			break;
 		}
-		else c /= 2.0;
+		else
+		{
+			for(auto it: packing.second)
+			{
+				for(auto gt: it->E) delete(gt);
+				delete(it);
+			}
+			if(packing.first >= ((1-eps3)*b/(2.0*(1+eps2))))
+			{
+				c /= 6.0;
+				lastrun = 1;
+			}
+			else c /= 2.0;
+		}
 	}
+
+	for(auto it: Edash) delete(it);
+	for(auto it: HE) delete(it);
+	delete(H);
+	delete(Gdash);
+
+	return res;
 }
